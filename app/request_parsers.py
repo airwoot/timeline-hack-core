@@ -1,4 +1,4 @@
-from reqparse import RequestParser
+from flask.ext.restful import reqparse
 
 # twitter parser
 twitter_parser = reqparse.RequestParser()
