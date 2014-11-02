@@ -23,4 +23,4 @@ from resources import Login, TwitterAuth
 
 api.add_resource(Login, '/login')
 api.add_resource(TwitterAuth, '/twitter_auth')
-api.add_resource(TwitterCallback. '/twitter_callback')
+api.add_resource(TwitterCallback, '/twitter_callback')
