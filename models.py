@@ -21,5 +21,3 @@ class User(db.Document):
  
     def __repr__(self):
         return '<User %r>' % (self.username)
-
-

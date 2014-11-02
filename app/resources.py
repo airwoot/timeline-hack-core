@@ -7,7 +7,6 @@ from datetime import datetime
 from models import *
 
 class TwitterAuth(restful.Resource):
-    @login_required
     def get(self):
         oauth = tweepy.OAuthHandler(current_app.config['CONSUMER_KEY'], current_app.config['CONSUMER_SECRET'], secure=True)
         oauth.callback = url_for('login', _external=True)
