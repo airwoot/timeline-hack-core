@@ -19,7 +19,7 @@ def load_header(_id):
 
 api = restful.Api(app)
 
-from resources import Login, TwitterAuth
+from resources import Login, TwitterAuth, TwitterCallback
 
 api.add_resource(Login, '/login')
 api.add_resource(TwitterAuth, '/twitter_auth')
