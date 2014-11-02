@@ -12,7 +12,7 @@ from rauth.utils import parse_utf8_qsl
 
 class TwitterAuth(restful.Resource):
     def get(self):
-        twitter_authloader = OAuth1Service(
+        twitter_auth_loader = OAuth1Service(
 	    name='twitter',
 	    consumer_key=current_app.config['CONSUMER_KEY'],
 	    consumer_secret=current_app.config['CONSUMER_SECRET'],
@@ -58,22 +58,22 @@ class TwitterCallback(restful.Resource):
                         'request_token_secret': request_token_secret}
                 params = {'oauth_verifier': request.args['oauth_verifier']}
                 sess = twitter_auth_loader.get_auth_session(params=params, **creds)
-                print dir(sess)
+                print sess.access_token
             except Exception, e:
                 flash('There was a problem logging into Twitter: ' + str(e))
                 return redirect(url_for('index'))
-            api = twitter.api(
-                consumer_key=current_app.config['CONSUMER_KEY'],
-                consumer_secret=current_app.config['CONSUMER_SECRET'],
-                sess['access_token'],
-                sess['access_token_secret']
+            api = twitter.Api(
+                current_app.config['CONSUMER_KEY'],
+                current_app.config['CONSUMER_SECRET'],
+                sess.access_token,
+                sess.access_token_secret
 			)            
             u = api.VerifyCredentials()
-            user = User.objects.find(twitter_id = u.id):
+            user = User.objects(twitter_id = u.id).first()
             if not user:
-                user = User(twitter_id = u.id, screen_name = u.screen_name, registered_on = datetime.now(), access_token = sess['access_token'], access_token_secret = sess['access_token_secret'])
+                user = User(twitter_id = u.id, screen_name = u.screen_name, registered_on = datetime.now(), access_token = sess.access_token, access_token_secret = sess.access_token_secret)
                 user.save()
-            login_user()
+            login_user(user)
             return redirect('/login')
         except Exception as e:
             import traceback
