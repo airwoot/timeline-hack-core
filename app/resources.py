@@ -11,8 +11,8 @@ session = dict()
 class TwitterAuth(restful.Resource):
     def get(self):
         oauth = tweepy.OAuthHandler(current_app.config['CONSUMER_KEY'], current_app.config['CONSUMER_SECRET'], secure=True)
-        session['request_token'] = (auth.request_token.key,
-                    auth.request_token.secret)
+        session['request_token'] = (oauth.request_token.key,
+                    oauth.request_token.secret)
         oauth.callback = url_for('twitter_callback', _external=True)
         auth_url = oauth.get_authorization_url()
         return redirect(auth_url)
