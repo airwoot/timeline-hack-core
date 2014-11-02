@@ -21,3 +21,8 @@ class User(db.Document):
  
     def __repr__(self):
         return '<User %r>' % (self.username)
+
+class TimelineList(db.Document):
+    screen_name = db.StringField(required = True)
+    belongs_to = db.IntField(required = True)
+    list_id = db.IntField(required = True)
