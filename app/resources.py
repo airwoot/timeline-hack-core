@@ -9,7 +9,7 @@ from models import *
 class TwitterAuth(restful.Resource):
     def get(self):
         oauth = tweepy.OAuthHandler(current_app.config['CONSUMER_KEY'], current_app.config['CONSUMER_SECRET'], secure=True)
-        oauth.callback = url_for('login', _external=True)
+        oauth.callback = url_for('twitter_callback', _external=True)
         auth_url = oauth.get_authorization_url()
         return redirect(auth_url)
        
@@ -18,7 +18,7 @@ class Login(restful.Resource):
         return {'status':'Welcome'}
     
 class TwitterCallback(restful.Resource):
-    def post(self):
+    def get(self):
         try:
             oauth = tweepy.OAuthHandler(current_app.config['CONSUMER_KEY'], current_app.config['CONSUMER_SECRET'], secure=True)
             verifier = request.args.get('oauth_verifier')
