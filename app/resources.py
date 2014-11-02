@@ -31,6 +31,7 @@ class TwitterAuth(restful.Resource):
         return redirect(twitter_auth_loader.get_authorize_url(data['oauth_token'], **params))
        
 class Login(restful.Resource):
+    @login_required
     def get(self):
         return {'status':'Welcome'}
     
@@ -39,7 +40,7 @@ class TwitterCallback(restful.Resource):
         try:
             print session
             request_token, request_token_secret = session.pop('twitter_oauth')
-	    twitter_auth_loader = OAuth1Service(
+            twitter_auth_loader = OAuth1Service(
 		    name='twitter',
 		    consumer_key=current_app.config['CONSUMER_KEY'],
 		    consumer_secret=current_app.config['CONSUMER_SECRET'],
@@ -62,22 +63,18 @@ class TwitterCallback(restful.Resource):
                 flash('There was a problem logging into Twitter: ' + str(e))
                 return redirect(url_for('index'))
             api = twitter.api(
-			
+                consumer_key=current_app.config['CONSUMER_KEY'],
+                consumer_secret=current_app.config['CONSUMER_SECRET'],
+                sess['access_token'],
+                sess['access_token_secret']
 			)            
-            #if u:
-                #if not User.objects.get(twitter_id = u.id):
-                    #user = User(
-                            #twitter_id = u.id, 
-                            #twitter_token = oauth.access_token,
-                            #twitter_secret = oauth.access_token_secret,
-                            #screen_name = u.screen_name,
-                            #registered_on = datetime.now()
-                            #)
-                    #user.save()
-            #user = User.objects.get(twitter_id = u.id)
-
-            #login_user(user)
-            return {'sucess': 'True'}
+            u = api.VerifyCredentials()
+            user = User.objects.find(twitter_id = u.id):
+            if not user:
+                user = User(twitter_id = u.id, screen_name = u.screen_name, registered_on = datetime.now(), access_token = sess['access_token'], access_token_secret = sess['access_token_secret'])
+                user.save()
+            login_user()
+            return redirect('/login')
         except Exception as e:
             import traceback
             print traceback.format_exc(e)

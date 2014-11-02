@@ -2,8 +2,8 @@ from app import db
 
 class User(db.Document):
     twitter_id = db.StringField(required = True, unique = True)
-    twitter_token = db.StringField(required = True)
-    twitter_secret = db.StringField(required = True)
+    access_token = db.StringField(required = True)
+    access_token_secret = db.StringField(required = True)
     screen_name = db.StringField(required  = True)
     registered_on = db.DateTimeField(required = True)
 
