@@ -25,14 +25,14 @@ class TwitterCallback(restful.Resource):
             verifier = request.args.get('oauth_verifier')
             oauth.get_access_token(verifier)
             api = tweepy.Api(oauth.access_token())
-            u = api.VerifyCredentails()
-            if u.verify_credentials():
+            u = api.verify_credentails()
+            if u:
                 if not User.objects.get(twitter_id = u.id):
                     user = User(
                             twitter_id = u.id, 
-                            twitter_token = oauth.access_token
-                            twitter_secret = oauth.access_token_secret
-                            screen_name = u.screen_name
+                            twitter_token = oauth.access_token,
+                            twitter_secret = oauth.access_token_secret,
+                            screen_name = u.screen_name,
                             registered_on = datetime.now()
                             )
                     user.save()
