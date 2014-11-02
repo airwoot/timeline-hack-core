@@ -1,4 +1,4 @@
-from flask import current_app, redirect, url_for
+from flask import current_app, redirect, url_for, request
 from flask.ext import restful
 from flask.ext.login import login_required, current_user, login_user, logout_user
 import tweepy
@@ -42,7 +42,7 @@ class TwitterCallback(restful.Resource):
                             registered_on = datetime.now()
                             )
                     user.save()
-            user = User.objects.get(twitter_id = '1')
+            user = User.objects.get(twitter_id = u.id)
 
             login_user(user)
             return
