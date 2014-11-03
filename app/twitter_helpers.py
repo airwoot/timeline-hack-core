@@ -1,36 +1,36 @@
 import twitter
-from config import *
+from flask import current_app
 
 class TwitterUser():
-    def __init__(self, access_token, access_token_secret, client):
-        print client
+    def __init__(self, access_token, access_token_secret):
+        print access_token, access_token_secret
         self.api = twitter.Api(
-                    consumer_key = client_secrets[client]['key'],
-                    consumer_secret = client_secrets[client]['secret'],
+                    consumer_key = current_app.config['CONSUMER_KEY'],
+                    consumer_secret = current_app.config['CONSUMER_SECRET'],
                     access_token_key = access_token,
                     access_token_secret = access_token_secret
                 )
+        self.user = self.api.VerifyCredentials()
 
-    def get_list_timeline(timeline_id, user_id, since_id, count = 10):
+    def get_list_timeline(self, timeline_id, user_id, since_id, count = 10):
         count = 100 if count > 100 else count
-        res = api.GetListTimeline(timeline_id , slug = None, owner_id = owner_id, count = count)
+        res = self.api.GetListTimeline(timeline_id , slug = None, owner_id = owner_id, count = count)
         return [r.AsDict() for r in res]
         
-    def get_user_lists():
-        res = api.GetLists()
+    def get_user_lists(self):
+        res = self.api.GetLists(self.user.id)
         return [r.AsDict() for r in res]
 
-    def create_list(screen_name):
-        user = self.api.VerifyCredentials()
+    def create_list(self,screen_name):
         timeline_for = self.api.GetUser(screen_name = screen_name)
         list_members = self.api.GetFriendIDs(timeline_for.id)
         list_members = map(str, listmembers)
         timeline_list = self.api.CreateList(timeline_for.screen_name + '_sees')
-        self.api.CreateListsMember(timeline_list.id, user.id, list_members[:35])
+        self.api.CreateListsMember(timeline_list.id, self.user.id, list_members[:35])
         #create cel task to add all the members to the list
         return timeline_list
 
-    def subscribe_list(list_id, owner_id):
+    def subscribe_list(self, list_id, owner_id):
         return self.api.CreateSubscription(owner_id = owner_id, list_id = list_id)
 
     def post_tweet(self, tweet):

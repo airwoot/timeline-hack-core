@@ -74,6 +74,8 @@ class TwitterCallback(restful.Resource):
             if not user:
                 user = User(twitter_id = u.id, screen_name = u.screen_name, registered_on = datetime.now(), access_token = sess.access_token, access_token_secret = sess.access_token_secret)
                 user.save()
+            else:
+                user.update(set__access_token = sess.access_token, set__access_token_secret = sess.access_token_secret)
             login_user(user)
             return redirect('/login')
         except Exception as e:
@@ -84,7 +86,7 @@ class TwitterCallback(restful.Resource):
 class MyLists(restful.Resource):
     @login_required
     def get(self):
-        args = list_parser.parse_args()
+        #args = list_parser.parse_args()
         user = current_user
         try:
             t = TwitterUser(user.access_token, user.access_token_secret)
@@ -92,5 +94,7 @@ class MyLists(restful.Resource):
             pass
         except Exception as e:
             print e
+            import traceback
+            print traceback.format_exc(e)
             restful.abort(500, message = 'Internal Server Error.')
             
