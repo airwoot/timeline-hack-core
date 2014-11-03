@@ -7,6 +7,7 @@ from datetime import datetime
 from models import *
 from rauth.service import OAuth1Service
 from rauth.utils import parse_utf8_qsl
+from twitter_helpers import TwitterUser
 
 
 
@@ -86,6 +87,8 @@ class MyLists(restful.Resource):
         args = list_parser.parse_args()
         user = current_user
         try:
+            t = TwitterUser(user.access_token, user.access_token_secret)
+            return t.get_user_lists()
             pass
         except Exception as e:
             print e

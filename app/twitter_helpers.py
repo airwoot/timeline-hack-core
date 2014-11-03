@@ -16,7 +16,7 @@ class TwitterUser():
         res = api.GetListTimeline(timeline_id , slug = None, owner_id = owner_id, count = count)
         return [r.AsDict() for r in res]
         
-    def get_user_lists(user_twitter_id):
+    def get_user_lists():
         res = api.GetLists()
         return [r.AsDict() for r in res]
 
