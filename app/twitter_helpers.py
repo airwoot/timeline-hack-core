@@ -12,9 +12,9 @@ class TwitterUser():
                 )
         self.user = self.api.VerifyCredentials()
 
-    def get_list_timeline(self, timeline_id, user_id, since_id, count = 10):
+    def get_list_timeline(self, timeline_id, user_id, since_id = None, count = 10):
         count = 100 if count > 100 else count
-        res = self.api.GetListTimeline(timeline_id , slug = None, owner_id = user_id, count = count)
+        res = self.api.GetListTimeline(timeline_id , slug = None, owner_id = user_id, count = count, since_id = None)
         return [r.AsDict() for r in res]
         
     def get_user_lists(self):

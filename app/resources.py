@@ -112,9 +112,56 @@ class CreateList(restful.Resource):
                 timeline_list = t.create_list(args['screen_name'])
                 list_db_obj = TimelineList(list_id = timeline_list.id, owner_id = t.user.id, screen_name = args['screen_name'].lower())
                 list_db_obj.save()
+                return timeline_list.AsDict()
                 return t.get_list_timeline(timeline_list.id, timeline_list.user.id, None)
             pass
         except Exception as e:
             import traceback
             print traceback.format_exc(e)
             restful.abort(500, message = 'internal server error.')
+
+class SubscribeList(restful.Resource):
+    @login_required
+    def get(self):
+        args = subscribe_list_parser.parse_args()
+        user = current_user
+        try:
+            t = TwitterUser(user.access_token, user.access_token_secret)
+            list_obj = TimelineList.objects(list_id = args['list_id']).first()
+            if not list_obj:
+                raise Exception('LIST NOT FOUND')
+            t.subscribe_list(list_id = list_obj.list_id, owner_id = list_obj.owner_id)
+            return {
+                    'success' : True
+                }
+        except Exception as e:
+            import traceback
+            print traceback.format_exc(e)
+            restful.abort(500, message = 'internal server error.')
+
+class DiscoverList(restful.Resource):
+    @login_required
+    def get(self):
+        args = discover_list_parser.parse_args()
+        try:
+            list_objs = list(TimelineList._get_collection().find({'exists' : True}).skip(args['skip']).limit(args['limit']))
+            map(lambda x:x.pop('_id'),list_objs)
+            return list_objs
+        except Exception as e:
+            import traceback
+            print traceback.format_exc(e)
+            restful.abort(500, message = 'internal server error.')
+
+class ListTimeline(restful.Resource):
+    @login_required
+    def get(self):
+        args = list_timeline_parser.parse_args()
+        user = current_user
+        try:
+            t = TwitterUser(user.access_token, user.access_token_secret)
+            return t.get_list_timeline(args['list_id'], args['owner_id'], args['since_id'], args['count'])
+        except Exception as e:
+            import traceback
+            print traceback.format_exc(e)
+            restful.abort(500, message = 'internal server error.')
+        

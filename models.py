@@ -26,3 +26,4 @@ class TimelineList(db.Document):
     screen_name = db.StringField(required = True)
     owner_id = db.IntField(required = True)
     list_id = db.IntField(required = True)
+    exists = db.BooleanField(default = True)
