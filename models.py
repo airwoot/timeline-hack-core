@@ -24,5 +24,5 @@ class User(db.Document):
 
 class TimelineList(db.Document):
     screen_name = db.StringField(required = True)
-    belongs_to = db.IntField(required = True)
+    owner_id = db.IntField(required = True)
     list_id = db.IntField(required = True)

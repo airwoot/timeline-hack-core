@@ -93,8 +93,28 @@ class MyLists(restful.Resource):
             return t.get_user_lists()
             pass
         except Exception as e:
-            print e
             import traceback
             print traceback.format_exc(e)
-            restful.abort(500, message = 'Internal Server Error.')
+            restful.abort(500, message = 'internal server error.')
             
+class CreateList(restful.Resource):
+    @login_required
+    def get(self):
+        args = create_list_parser.parse_args()
+        user = current_user
+        try:
+            t = TwitterUser(user.access_token, user.access_token_secret)
+            list_objs = TimelineList.objects(screen_name = args['screen_name'].lower())
+            if list_objs:
+                list_obj = list_objs[0]
+                return t.get_list_timeline(list_obj.list_id, list_obj.owner_id, args['since_id'])
+            else:
+                timeline_list = t.create_list(args['screen_name'])
+                list_db_obj = TimelineList(list_id = timeline_list.id, owner_id = t.user.id, screen_name = args['screen_name'].lower())
+                list_db_obj.save()
+                return t.get_list_timeline(timeline_list.id, timeline_list.user.id, None)
+            pass
+        except Exception as e:
+            import traceback
+            print traceback.format_exc(e)
+            restful.abort(500, message = 'internal server error.')

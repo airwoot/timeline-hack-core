@@ -14,7 +14,7 @@ class TwitterUser():
 
     def get_list_timeline(self, timeline_id, user_id, since_id, count = 10):
         count = 100 if count > 100 else count
-        res = self.api.GetListTimeline(timeline_id , slug = None, owner_id = owner_id, count = count)
+        res = self.api.GetListTimeline(timeline_id , slug = None, owner_id = user_id, count = count)
         return [r.AsDict() for r in res]
         
     def get_user_lists(self):
@@ -22,11 +22,12 @@ class TwitterUser():
         return [r.AsDict() for r in res]
 
     def create_list(self,screen_name):
+        print screen_name
         timeline_for = self.api.GetUser(screen_name = screen_name)
         list_members = self.api.GetFriendIDs(timeline_for.id)
-        list_members = map(str, listmembers)
+        list_members = map(str, list_members)
         timeline_list = self.api.CreateList(timeline_for.screen_name + '_sees')
-        self.api.CreateListsMember(timeline_list.id, self.user.id, list_members[:35])
+        self.api.CreateListsMember(timeline_list.id, self.user.id, list_members[0:29])
         #create cel task to add all the members to the list
         return timeline_list
 
