@@ -8,6 +8,7 @@ create_list_parser.add_argument('since_id', type = int , location = 'args')
 #subscribe list parser
 subscribe_list_parser = reqparse.RequestParser()
 subscribe_list_parser.add_argument('list_id', type = int, location='args', required  = True)
+subscribe_list_parser.add_argument('owner_id', type = int, location='args', required  = True)
 
 #discover list parser
 discover_list_parser = reqparse.RequestParser()

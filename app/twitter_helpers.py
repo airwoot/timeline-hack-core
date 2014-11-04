@@ -25,10 +25,15 @@ class TwitterUser():
         return [r.AsDict() for r in res]
         
     def get_user_lists(self):
-        res_owned = [r.AsDict for r in self.api.GetLists(self.user.id)]
-        res_subs = [r.AsDict for r in self.api.GetSubscription(self.user.id)]
+        res_owned = [r.AsDict() for r in self.api.GetLists(self.user.id)]
+        res_subs = [r.AsDict() for r in self.api.GetSubscriptions(self.user.id)]
         res = res_owned + res_subs
         return {v['id']:v for v in res}.values()
+
+    def get_list(self, list_id, owner_id):
+        res = self.api._RequestUrl('https://api.twitter.com/1.1/lists/show.json?', 'GET', data = {'list_id':list_id, 'owner_id':owner_id})
+        data = self.api._ParseAndCheckTwitter(res.content)
+        return data
 
     def create_list(self,screen_name):
         from cel_tasks import add_users_to_list
@@ -40,10 +45,10 @@ class TwitterUser():
         self.api.CreateListsMember(timeline_list.id, self.user.id, list_members[0:29])
         #create cel task to add all the members to the list
         member_chunks = list(chunks(list_members[30:5000], 30))
-        countdown = 60
+        countdown = 1
         for c in member_chunks:
-            add_users_to_list.apply_acync(args[self.access_token, self.access_token_secret, timeline_list.id, c], countdown = )
-            countdown += 60
+            add_users_to_list.apply_async(args = [self.access_token, self.access_token_secret, timeline_list.id, self.user.id, c], countdown = countdown)
+            countdown += 2
         return timeline_list
     
     def add_list_members(self, list_id, list_members):

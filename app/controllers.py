@@ -1,7 +1,7 @@
 from flask import current_app
 from twitter_helpers import TwitterUser
 import twitter
-from models import TimelineList
+from models import TimelineList, User
 
 def get_logged_in_users_list(user):
     """
@@ -11,22 +11,28 @@ def get_logged_in_users_list(user):
     t = TwitterUser(user.access_token, user.access_token_secret)
     lists = t.get_user_lists()
     res_lists = filter(lambda x:x if '_sees' in x['name'] else None, lists)
+    return res_lists
     
 def create_list(user , screen_name):
     """
         Create list in twitter by finding user by screenname
     """
-    t = TwitterUser(user.access_token, user.access_token_secret)
-    list_objs = TimelineList.objects(screen_name = screen_name.lower())
-    if list_objs:
-        list_obj = list_objs[0]
-        #return list_object here
-        return t.get_list_timeline(list_obj.list_id, list_obj.owner_id)
-    else:
-        timeline_list = t.create_list(screen_name)
-        list_db_obj = TimelineList(list_id = timeline_list.id, owner_id = t.user.id, screen_name = screen_name.lower())
-        list_db_obj.save()
-        return timeline_list.AsDict()
+    try:
+        t = TwitterUser(user.access_token, user.access_token_secret)
+        list_objs = TimelineList.objects(screen_name = screen_name.lower(), exists = True)
+        if list_objs:
+            list_obj = list_objs[0]
+            return t.get_list(list_obj.list_id, list_obj.owner_id)
+            return t.get_list_timeline(list_obj.list_id, list_obj.owner_id)
+        else:
+            timeline_list = t.create_list(screen_name)
+            list_db_obj = TimelineList(list_id = timeline_list.id, owner_id = t.user.id, screen_name = screen_name.lower())
+            list_db_obj.save()
+            return timeline_list.AsDict()
+    except twitter.TwitterError as e:
+        if e.message[0]['code'] == 34:
+            list_obj.update(set__exists = False)
+            create_list(user , screen_name)
 
 def subscribe_list(user, list_id, owner_id):
     """
@@ -46,6 +52,17 @@ def list_timeline(user, list_id, owner_id, since_id, count):
         Get timeline of a list from twitter.
         TODO If list is deleted create a new one on behalf of user and send timeline
     """
-    t = TwitterUser(user.access_token, user.access_token_secret)
-    return t.get_list_timeline(list_id, owner_id, since_id, count)
-
+    try:
+        t = TwitterUser(user.access_token, user.access_token_secret)
+        return t.get_list_timeline(list_id, owner_id, since_id, count)
+    except twitter.TwitterError as e:
+        from random import choice, randint
+        if e.message[0]['code'] == 88:
+            user = list(User.objects(access_token_active = True).skip(randint(0,1)).limit(10))
+            user = choice(user)
+            return list_timeline(user, list_id, owner_id, since_id, count)
+        else:
+            raise e
+def update_list_status(list_id, exists):
+    print exists
+    TimelineList._get_collection().update({'list_id':list_id},{'$set':{'exists':False}})

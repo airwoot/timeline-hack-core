@@ -1,1 +1,1 @@
-celery worker --concurrency=5 --app=cel_tasks -l info -f cel.log --pid ./cel.pid
+celery worker --concurrency=5 --app=cel_tasks -l info -f ~/cel.log --pid ./cel.pid

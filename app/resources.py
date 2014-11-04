@@ -9,6 +9,7 @@ from rauth.service import OAuth1Service
 from rauth.utils import parse_utf8_qsl
 from twitter_helpers import TwitterUser
 import controllers
+import traceback
 
 
 
@@ -93,6 +94,9 @@ class MyLists(restful.Resource):
         try:
             return controllers.get_logged_in_users_list(user)
             pass
+        except twitter.TwitterError as e:
+            if e.message[0]['code'] == 88:
+                restful.abort(404, message = 'Limit for your access token has reached. Be patient and see some of the popular timelines')
         except Exception as e:
             import traceback
             print traceback.format_exc(e)
@@ -106,6 +110,9 @@ class CreateList(restful.Resource):
         try:
             return controllers.create_list(user, args['screen_name'])
             pass
+        except twitter.TwitterError as e:
+            if e.message[0]['code'] == 88:
+                restful.abort(404, message = 'Limit for your access token has reached. You can create more timenlines later. Try some of the popular timelines for now.')
         except Exception as e:
             import traceback
             print traceback.format_exc(e)
@@ -118,6 +125,9 @@ class SubscribeList(restful.Resource):
         user = current_user
         try:
             return controllers.subscribe_list(user, args['list_id'], args['owner_id'])
+        except twitter.TwitterError as e:
+            if e.message[0]['code'] == 88:
+                restful.abort(404, message = 'Limit for your access token has reached. You may subscribe to interesting timelines later. Just enjoy popular timelines for now.')
         except Exception as e:
             import traceback
             print traceback.format_exc(e)
@@ -143,6 +153,10 @@ class ListTimeline(restful.Resource):
         user = current_user
         try:
             return controllers.list_timeline(user, args['list_id'], args['owner_id'], args['since_id'], args['count'])
+        except twitter.TwitterError as e:
+            if e.message[0]['code'] == 34:
+                controllers.update_list_status(args['list_id'], exists = False)
+                restful.abort(404, message = 'Sorry page not found')
         except Exception as e:
             import traceback
             print traceback.format_exc(e)
