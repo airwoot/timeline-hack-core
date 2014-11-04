@@ -8,7 +8,8 @@ def get_logged_in_users_list(user):
         TODO : return lists that are celeb timelines
     """
     t = TwitterUser(user.access_token, user.access_token_secret)
-    return t.get_user_lists()
+    lists = t.get_user_lists()
+    res_lists = filter(lambda x:x if '_sees' in x['name'] else None, lists)
     
 def create_list(user , screen_name):
     """
