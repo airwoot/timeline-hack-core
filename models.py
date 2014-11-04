@@ -6,6 +6,7 @@ class User(db.Document):
     access_token_secret = db.StringField(required = True)
     screen_name = db.StringField(required  = True)
     registered_on = db.DateTimeField(required = True)
+    access_active = db.BooleanField(default = True)
 
     def is_authenticated(self):
         return True
