@@ -8,7 +8,7 @@ from models import *
 from rauth.service import OAuth1Service
 from rauth.utils import parse_utf8_qsl
 from twitter_helpers import TwitterUser
-from controllers import *
+import controllers
 
 
 
@@ -88,6 +88,7 @@ class MyLists(restful.Resource):
     @login_required
     def get(self):
         #args = list_parser.parse_args()
+        #TODO also return subscribed lists
         user = current_user
         try:
             return controllers.get_logged_in_users_list(user)

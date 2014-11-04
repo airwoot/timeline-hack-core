@@ -24,7 +24,7 @@ from resources import Login, TwitterAuth, TwitterCallback, MyLists, CreateList, 
 api.add_resource(Login, '/login')
 api.add_resource(TwitterAuth, '/twitter_auth')
 api.add_resource(TwitterCallback, '/twitter_callback')
-api.add_resource(MyLists, '/mylists')
+api.add_resource(MyLists, '/list/my')
 api.add_resource(CreateList, '/list/create')
 api.add_resource(SubscribeList, '/list/subscribe')
 api.add_resource(DiscoverList, '/list/discover')
