@@ -1,13 +1,14 @@
 from flask import current_app, redirect, url_for, request, session, flash
 from flask.ext import restful
 from flask.ext.login import login_required, current_user, login_user, logout_user
-import tweepy, twitter
+import twitter
 from request_parsers import *
 from datetime import datetime
 from models import *
 from rauth.service import OAuth1Service
 from rauth.utils import parse_utf8_qsl
 from twitter_helpers import TwitterUser
+from controllers import *
 
 
 
@@ -89,8 +90,7 @@ class MyLists(restful.Resource):
         #args = list_parser.parse_args()
         user = current_user
         try:
-            t = TwitterUser(user.access_token, user.access_token_secret)
-            return t.get_user_lists()
+            return controllers.get_logged_in_users_list(user)
             pass
         except Exception as e:
             import traceback
@@ -103,17 +103,7 @@ class CreateList(restful.Resource):
         args = create_list_parser.parse_args()
         user = current_user
         try:
-            t = TwitterUser(user.access_token, user.access_token_secret)
-            list_objs = TimelineList.objects(screen_name = args['screen_name'].lower())
-            if list_objs:
-                list_obj = list_objs[0]
-                return t.get_list_timeline(list_obj.list_id, list_obj.owner_id, args['since_id'])
-            else:
-                timeline_list = t.create_list(args['screen_name'])
-                list_db_obj = TimelineList(list_id = timeline_list.id, owner_id = t.user.id, screen_name = args['screen_name'].lower())
-                list_db_obj.save()
-                return timeline_list.AsDict()
-                return t.get_list_timeline(timeline_list.id, timeline_list.user.id, None)
+            return controllers.create_list(user, args['screen_name'])
             pass
         except Exception as e:
             import traceback
@@ -126,14 +116,7 @@ class SubscribeList(restful.Resource):
         args = subscribe_list_parser.parse_args()
         user = current_user
         try:
-            t = TwitterUser(user.access_token, user.access_token_secret)
-            list_obj = TimelineList.objects(list_id = args['list_id']).first()
-            if not list_obj:
-                raise Exception('LIST NOT FOUND')
-            t.subscribe_list(list_id = list_obj.list_id, owner_id = list_obj.owner_id)
-            return {
-                    'success' : True
-                }
+            return controllers.subscribe_list(user, args['list_id'], args['owner_id'])
         except Exception as e:
             import traceback
             print traceback.format_exc(e)
@@ -158,8 +141,7 @@ class ListTimeline(restful.Resource):
         args = list_timeline_parser.parse_args()
         user = current_user
         try:
-            t = TwitterUser(user.access_token, user.access_token_secret)
-            return t.get_list_timeline(args['list_id'], args['owner_id'], args['since_id'], args['count'])
+            return controllers.list_timeline(user, args['list_id'], args['owner_id'], args['since_id'], args['count'])
         except Exception as e:
             import traceback
             print traceback.format_exc(e)
