@@ -79,7 +79,7 @@ class TwitterCallback(restful.Resource):
             else:
                 user.update(set__access_token = sess.access_token, set__access_token_secret = sess.access_token_secret)
             login_user(user)
-            return redirect('/login')
+            return u.AsDict()
         except Exception as e:
             import traceback
             print traceback.format_exc(e)
