@@ -29,3 +29,12 @@ api.add_resource(CreateList, '/list/create')
 api.add_resource(SubscribeList, '/list/subscribe')
 api.add_resource(DiscoverList, '/list/discover')
 api.add_resource(ListTimeline, '/list/timeline')
+
+app.route('/css/<name:name>')
+def css(name):
+    return app.send_static_file('css/'+'name')
+
+app.route('/js/<name:name>')
+def js(name):
+    return app.send_static_file('js/'+'name')
+

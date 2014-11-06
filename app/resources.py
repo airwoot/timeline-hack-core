@@ -36,6 +36,7 @@ class TwitterAuth(restful.Resource):
 class Login(restful.Resource):
     @login_required
     def get(self):
+        return current_app.send_static_file('views/login.html')
         return {'status':'Welcome'}
     
 class TwitterCallback(restful.Resource):
