@@ -1,4 +1,4 @@
-from flask import Flask, g
+from flask import Flask, g, send_file
 from flask.ext.login import LoginManager
 from flask.ext.mongoengine import MongoEngine
 from flask.ext import restful
@@ -30,11 +30,18 @@ api.add_resource(SubscribeList, '/list/subscribe')
 api.add_resource(DiscoverList, '/list/discover')
 api.add_resource(ListTimeline, '/list/timeline')
 
-app.route('/css/<name:name>')
+@app.route('/css/<path:name>')
 def css(name):
-    return app.send_static_file('css/'+'name')
+    return send_file('static/css/'+name)
 
-app.route('/js/<name:name>')
+@app.route('/js/<path:name>')
 def js(name):
-    return app.send_static_file('js/'+'name')
+    return send_file('static/js/'+name)
 
+@app.route('/fonts/<path:name>')
+def fonts(name):
+    return send_file('static/fonts/'+name)
+
+print app.url_map
+print dir(app.static_url_path)
+print app.send_static_file

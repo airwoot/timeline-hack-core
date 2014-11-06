@@ -1,4 +1,4 @@
-from flask import current_app, redirect, url_for, request, session, flash
+from flask import current_app, redirect, url_for, request, session, flash, send_file
 from flask.ext import restful
 from flask.ext.login import login_required, current_user, login_user, logout_user
 import twitter
@@ -36,7 +36,8 @@ class TwitterAuth(restful.Resource):
 class Login(restful.Resource):
     @login_required
     def get(self):
-        return current_app.send_static_file('views/login.html')
+        return send_file('views/login.html')
+        #return current_app.send_static_file('views/login.html')
         return {'status':'Welcome'}
     
 class TwitterCallback(restful.Resource):
