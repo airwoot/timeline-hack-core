@@ -12,29 +12,34 @@ def get_logged_in_users_list(user):
     lists = t.get_user_lists()
     res_lists = filter(lambda x:x if '_sees' in x['name'] else None, lists)
     return res_lists
+
+def get_list(user, list_obj):
+    """
+        return existing list details
+    """
+    try:
+        t = TwitterUser(user.access_token, user.access_token_secret)
+        return t.get_list(list_obj.list_id, list_obj.owner_id)
+    except twitter.TwitterError as e:
+        if e.message[0]['code'] == 34:
+            list_obj.update(set__exists = False)
+            return False
     
 def create_list(user , screen_name):
     """
         Create list in twitter by finding user by screenname
     """
-    try:
-        t = TwitterUser(user.access_token, user.access_token_secret)
-        list_objs = TimelineList.objects(screen_name = screen_name.lower(), exists = True)
-        if list_objs:
-            list_obj = list_objs[0]
-            return t.get_list(list_obj.list_id, list_obj.owner_id)
-            return t.get_list_timeline(list_obj.list_id, list_obj.owner_id)
-        else:
-            timeline_list = t.create_list(screen_name)
-            list_db_obj = TimelineList(list_id = timeline_list.id, owner_id = t.user.id, screen_name = screen_name.lower())
-            list_db_obj.save()
-            return timeline_list.AsDict()
-    except twitter.TwitterError as e:
-        print e
-        if e.message[0]['code'] == 34:
-            if list_objs:
-                list_objs[0].update(set__exists = False)
-            return create_list(user , screen_name)
+    t = TwitterUser(user.access_token, user.access_token_secret)
+    list_objs = TimelineList.objects(screen_name = screen_name.lower(), exists = True)
+    if list_objs:
+        list_obj = list_objs[0]
+        list_details = get_list(user, list_obj.list_id, list_obj.owner_id)
+        if list_details:
+            return list_details
+    timeline_list = t.create_list(screen_name)
+    list_db_obj = TimelineList(list_id = timeline_list.id, owner_id = t.user.id, screen_name = screen_name.lower())
+    list_db_obj.save()
+    return timeline_list.AsDict()
 
 def subscribe_list(user, list_id, owner_id):
     """
