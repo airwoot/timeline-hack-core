@@ -113,7 +113,9 @@ class CreateList(restful.Resource):
             return controllers.create_list(user, args['screen_name'])
             pass
         except twitter.TwitterError as e:
-            if e.message[0]['code'] == 88:
+            if e.message[0]['code'] == 34:
+                restful.abort(404, message = 'Sorry user not found on twitter.')
+            elif e.message[0]['code'] == 88:
                 restful.abort(404, message = 'Limit for your access token has reached. You can create more timenlines later. Try some of the popular timelines for now.')
         except Exception as e:
             import traceback

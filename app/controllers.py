@@ -30,9 +30,11 @@ def create_list(user , screen_name):
             list_db_obj.save()
             return timeline_list.AsDict()
     except twitter.TwitterError as e:
+        print e
         if e.message[0]['code'] == 34:
-            list_obj.update(set__exists = False)
-            create_list(user , screen_name)
+            if list_objs:
+                list_objs[0].update(set__exists = False)
+            return create_list(user , screen_name)
 
 def subscribe_list(user, list_id, owner_id):
     """
