@@ -34,7 +34,6 @@ class TwitterAuth(restful.Resource):
         return redirect(twitter_auth_loader.get_authorize_url(data['oauth_token'], **params))
        
 class Login(restful.Resource):
-    @login_required
     def get(self):
         return send_file('views/login.html')
         #return current_app.send_static_file('views/login.html')
