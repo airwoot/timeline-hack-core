@@ -42,6 +42,12 @@ def js(name):
 def fonts(name):
     return send_file('static/fonts/'+name)
 
-print app.url_map
-print dir(app.static_url_path)
-print app.send_static_file
+@app.after_request
+def add_access_control_headers(response):
+    """Adds the required access control headers"""
+    response.headers['Access-Control-Allow-Origin'] = '*' 
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Set-Cookie'
+    response.headers['Access-Control-Allow-Methods'] = 'POST,GET,PUT,DELETE'
+    response.headers['Cache-Control'] = 'No-Cache'
+    return response
+

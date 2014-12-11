@@ -35,7 +35,7 @@ class TwitterAuth(restful.Resource):
        
 class Login(restful.Resource):
     def get(self):
-        return send_file('views/login.html')
+        return send_file('views/index.html')
         #return current_app.send_static_file('views/login.html')
         return {'status':'Welcome'}
     
@@ -80,7 +80,8 @@ class TwitterCallback(restful.Resource):
             else:
                 user.update(set__access_token = sess.access_token, set__access_token_secret = sess.access_token_secret)
             login_user(user)
-            return u.AsDict()
+            # return controllers.get_logged_in_users_list(user)
+            return redirect('http://localhost:8000')
         except Exception as e:
             import traceback
             print traceback.format_exc(e)

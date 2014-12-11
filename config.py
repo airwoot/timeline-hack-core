@@ -20,4 +20,6 @@ class ProductionConfig():
     REDISHOST = 'localhost'
     REDISDB = 1
 
+    SESSION_COOKIE_HTTPONLY = False
+
 
