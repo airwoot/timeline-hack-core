@@ -30,18 +30,6 @@ api.add_resource(SubscribeList, '/list/subscribe')
 api.add_resource(DiscoverList, '/list/discover')
 api.add_resource(ListTimeline, '/list/timeline')
 
-@app.route('/css/<path:name>')
-def css(name):
-    return send_file('static/css/'+name)
-
-@app.route('/js/<path:name>')
-def js(name):
-    return send_file('static/js/'+name)
-
-@app.route('/fonts/<path:name>')
-def fonts(name):
-    return send_file('static/fonts/'+name)
-
 @app.after_request
 def add_access_control_headers(response):
     """Adds the required access control headers"""
